@@ -101,8 +101,8 @@ func builtGoFiles(t *testing.T) map[string]bool {
 		t.Fatal(err)
 	}
 	files := map[string]bool{}
-	for _, abs := range strings.Fields(string(out)) {
-		rel, err := filepath.Rel(wd, abs)
+	for line := range strings.Lines(string(out)) {
+		rel, err := filepath.Rel(wd, strings.TrimSuffix(line, "\n"))
 		if err != nil {
 			t.Fatal(err)
 		}
