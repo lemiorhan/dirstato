@@ -539,22 +539,69 @@ func TestHelpKeepsCloseHintOnShortTerminals(t *testing.T) {
 	}
 }
 
-func TestHelpFitsAnEightyColumnTerminal(t *testing.T) {
+func TestHelpAndLegendsFitAnEightyColumnTerminal(t *testing.T) {
+	if len(helpText) < 10 || len(fullLegend) < 5 {
+		t.Fatalf("help has %d lines and the full legend %d, want at least 10 and 5", len(helpText), len(fullLegend))
+	}
+	for _, l := range append(append([]string{shortLegend}, fullLegend...), helpText...) {
+		if w := ansi.StringWidth(l); w > 80 {
+			t.Errorf("%q is %d columns wide, want at most 80", l, w)
+		}
+	}
+
 	_, m := setup(t)
 	m.help = true
 	m.width, m.height = 80, 100
 	lines := strings.Split(ansi.Strip(m.render()), "\n")
-	if len(helpText) < 10 || len(lines) != 1+len(helpText) {
-		t.Fatalf("help has %d text lines and renders %d, want at least 10 shown in full", len(helpText), len(lines))
+	if len(lines) != 1+len(helpText) {
+		t.Fatalf("help renders %d lines, want all %d", len(lines), 1+len(helpText))
 	}
-	for i, want := range map[int]string{0: "dirstato · help", 1: "Keys", 15: "Columns", len(lines) - 1: "Press ? or esc to close."} {
-		if got := strings.TrimRight(lines[i], " "); got != want {
-			t.Errorf("help line %d = %q, want %q", i, got, want)
+	for _, c := range []struct {
+		line int
+		want string
+	}{
+		{0, "dirstato · help"},
+		{1, "Keys"},
+		{15, "Columns"},
+		{len(lines) - 1, "Press ? or esc to close."},
+	} {
+		if got := strings.TrimRight(lines[c.line], " "); got != c.want {
+			t.Errorf("help line %d = %q, want %q", c.line, got, c.want)
 		}
 	}
 	for i, want := range helpText {
 		if got := strings.TrimRight(lines[1+i], " "); got != want {
 			t.Errorf("help line %d is cut at 80 columns:\n got %q\nwant %q", i, got, want)
+		}
+	}
+}
+
+func TestShortLegendShowsHelpAndQuitAtEightyColumns(t *testing.T) {
+	_, m := setup(t)
+	m.width, m.height = 80, 24
+	if screen := ansi.Strip(m.render()); !endsSomeLine(screen, "· ? help · q quit") {
+		t.Errorf("no line ends with the help and quit keys at 80x24:\n%s", screen)
+	}
+}
+
+func TestProgressSaysFileAndFolderForOne(t *testing.T) {
+	for _, tc := range []struct {
+		files, dirs  int64
+		scan, rescan string
+	}{
+		{1, 2, "scanning… 1 file · 2 folders · ", "rescanning… 1 file · "},
+		{2, 1, "scanning… 2 files · 1 folder · ", "rescanning… 2 files · "},
+	} {
+		m := New(Config{Root: t.TempDir(), Copy: func(string) error { return nil }})
+		m, _ = m.update(tea.WindowSizeMsg{Width: 120, Height: 40})
+		m.progress.Files.Store(tc.files)
+		m.progress.Dirs.Store(tc.dirs)
+		if screen := ansi.Strip(m.render()); !strings.Contains(screen, tc.scan) {
+			t.Errorf("progress screen does not contain %q:\n%s", tc.scan, screen)
+		}
+		m.state = rescanning
+		if s := ansi.Strip(m.statusLine()); !strings.HasPrefix(s, tc.rescan) {
+			t.Errorf("rescan status %q does not start with %q", s, tc.rescan)
 		}
 	}
 }

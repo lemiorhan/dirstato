@@ -51,10 +51,13 @@ func TestCLIHelpAndErrors(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	const help = usageLine + "\n" +
+		"\n" +
+		"  path        folder to scan (default: the current folder)\n" +
+		"  --min SIZE  hide items smaller than SIZE, e.g. 100M, 1.5G (base 1024)\n"
 	stdout, stderr, code := run(t, bin, "--help")
-	if code != 0 || stderr != "" || !strings.HasPrefix(stdout, usageLine+"\n") ||
-		!strings.Contains(stdout, "folder to scan (default: the current folder)") {
-		t.Errorf("--help: exit %d, stdout %q, stderr %q", code, stdout, stderr)
+	if code != 0 || stderr != "" || stdout != help {
+		t.Errorf("--help: exit %d, stderr %q, stdout:\n%s\nwant:\n%s", code, stderr, stdout, help)
 	}
 
 	for _, tc := range []struct {
@@ -67,6 +70,7 @@ func TestCLIHelpAndErrors(t *testing.T) {
 		{[]string{"--bogus"}, 2, "dirstato: unknown flag: --bogus", true},
 		{[]string{dir, dir}, 2, "dirstato: only one path can be given", true},
 		{[]string{"--min", "5X", dir}, 2, `dirstato: invalid size: "5X" (examples: 500M, 1.5G, 0)`, true},
+		{[]string{"--min=99999P", dir}, 2, `dirstato: size too large: "99999P"`, true},
 		{[]string{file}, 1, "dirstato: " + file + " is not a folder", false},
 	} {
 		stdout, stderr, code := run(t, bin, tc.args...)
@@ -81,10 +85,34 @@ func TestCLIHelpAndErrors(t *testing.T) {
 	}
 }
 
-var turkish = regexp.MustCompile(`[çğıöşüÇĞİÖŞÜ]|\b(bir|yok|isim|dosya|boyut|iptal|kapat|hareket|tarih|kopyala|tara)\b`)
+var (
+	turkishLetters = regexp.MustCompile(`[çğıöşüÇĞİÖŞÜ]`)
+	turkishWords   = regexp.MustCompile(`\b(bir|yok|isim|dosya|boyut|iptal|kapat|hareket|tarih|kopyala|tara|kolonlar|bilinmeyen)\b`)
+)
+
+func builtGoFiles(t *testing.T) map[string]bool {
+	t.Helper()
+	out, err := exec.Command("go", "list", "-f", `{{$d := .Dir}}{{range .GoFiles}}{{$d}}/{{.}}{{"\n"}}{{end}}`, "./...").Output()
+	if err != nil {
+		t.Fatalf("go list: %v", err)
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	files := map[string]bool{}
+	for _, abs := range strings.Fields(string(out)) {
+		rel, err := filepath.Rel(wd, abs)
+		if err != nil {
+			t.Fatal(err)
+		}
+		files[rel] = true
+	}
+	return files
+}
 
 func TestUserFacingStringsAreEnglish(t *testing.T) {
-	var literals int
+	parsed := map[string]bool{}
 	var sawUsage bool
 	err := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -100,6 +128,7 @@ func TestUserFacingStringsAreEnglish(t *testing.T) {
 		if err != nil {
 			return err
 		}
+		parsed[path] = true
 		ast.Inspect(f, func(n ast.Node) bool {
 			lit, ok := n.(*ast.BasicLit)
 			if !ok || lit.Kind != token.STRING {
@@ -110,9 +139,8 @@ func TestUserFacingStringsAreEnglish(t *testing.T) {
 				t.Errorf("%s: cannot unquote %s", path, lit.Value)
 				return true
 			}
-			literals++
 			sawUsage = sawUsage || strings.HasPrefix(s, usageLine)
-			if w := turkish.FindString(strings.ToLower(s)); w != "" {
+			if w := turkishLetters.FindString(s) + turkishWords.FindString(strings.ToLower(s)); w != "" {
 				t.Errorf("%s: string %q contains Turkish %q", path, s, w)
 			}
 			return true
@@ -122,7 +150,23 @@ func TestUserFacingStringsAreEnglish(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if literals < 50 || !sawUsage {
-		t.Errorf("scanned %d string literals, usage text found = %v; the scan is not reaching the sources", literals, sawUsage)
+	built := builtGoFiles(t)
+	for _, f := range []string{"main.go", "internal/ui/render.go", "internal/ui/ui.go"} {
+		if !built[f] {
+			t.Errorf("go list does not report %s among the built files: %v", f, built)
+		}
+	}
+	for f := range built {
+		if !parsed[f] {
+			t.Errorf("%s is built but was not scanned", f)
+		}
+	}
+	for f := range parsed {
+		if !built[f] {
+			t.Errorf("%s was scanned but is not a built file", f)
+		}
+	}
+	if !sawUsage {
+		t.Error("the usage text was not among the scanned literals")
 	}
 }

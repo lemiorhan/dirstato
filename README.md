@@ -43,7 +43,7 @@ dirstato  /opt/homebrew/Cellar/go/1.27.4/libexec · size desc · min 4M · tree
    8.6M   3% █              30 2026-11-02   ▸ api/
    2.3M   1% █              58                … 9 small items
 ────────────────────────────────────────────────────────────────────────────────────────────
-↑↓ move · →← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit
+→← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit
 ```
 
 <sub>dirstato scanning a Go installation with <code>--min 4M</code>. Items under
@@ -154,14 +154,14 @@ items.
 
 ### Columns
 
-| Column        | Meaning                                                                  |
-| ------------- | ------------------------------------------------------------------------ |
-| size          | Disk usage in base 1024, the same measure as `du -skx`                   |
-| %, bar        | Share of the parent folder                                               |
-| count         | Number of files in the subtree (folders are not counted)                 |
-| date          | Newest file modification time in the subtree, as `YYYY-MM-DD`            |
+| Column            | Meaning                                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| size              | Disk usage in base 1024, the same measure as `du -skx`               |
+| %, bar            | Share of the parent folder                                           |
+| count             | Number of files in the subtree (folders are not counted)             |
+| date              | Newest file modification time in the subtree, as `YYYY-MM-DD`        |
 | `… N small items` | Items hidden below the minimum size, summed into one row per folder  |
-| `!`           | The folder could not be read; its size may be incomplete                 |
+| `!`               | The folder could not be read; its size may be incomplete             |
 
 On narrow terminals the date column is dropped first, then the count. The
 widths are the `dropDateBelow` and `dropCountBelow` constants in

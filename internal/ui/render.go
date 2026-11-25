@@ -39,7 +39,8 @@ var fullLegend = []string{
 	"?        help           q    quit",
 }
 
-const shortLegend = "↑↓ move · →← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit"
+// Leaves out ↑↓ so the line fits an 80-column terminal.
+const shortLegend = "→← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit"
 
 var helpText = []string{
 	"Keys",
@@ -147,7 +148,7 @@ func (m Model) header() []string {
 	}
 	labels := " · " + sortLabels[m.sort] + " · " + minLabel + " · " + view
 	if n := m.tree.Errors(); n > 0 {
-		labels += " · " + errorStyle.Render(fmt.Sprintf("%d unreadable %s", n, plural(n, "folder")))
+		labels += " · " + errorStyle.Render(fmt.Sprintf("%d unreadable %s", n, plural(int64(n), "folder")))
 	}
 	title := headerStyle.Render("dirstato") + "  "
 	room := m.width - ansi.StringWidth(title) - ansi.StringWidth(labels)
@@ -179,8 +180,9 @@ func (m Model) statusLine() string {
 	case m.editing:
 		return m.input.View() + dimStyle.Render("   ⏎ apply · esc cancel")
 	case m.state == rescanning:
-		return fmt.Sprintf("rescanning… %s files · %s · %s",
-			formatCount(m.progress.Files.Load()), units.FormatSize(m.progress.Bytes.Load()),
+		files := m.progress.Files.Load()
+		return fmt.Sprintf("rescanning… %s %s · %s · %s",
+			formatCount(files), plural(files, "file"), units.FormatSize(m.progress.Bytes.Load()),
 			ansi.Truncate(m.progress.Current(), max(10, m.width-50), "…"))
 	}
 	return ansi.Truncate(m.status, m.width, "…")
@@ -189,11 +191,13 @@ func (m Model) statusLine() string {
 func (m Model) renderProgress() string {
 	p := m.progress
 	elapsed := time.Since(m.started).Round(time.Second)
+	files, dirs := p.Files.Load(), p.Dirs.Load()
 	lines := []string{
 		headerStyle.Render("dirstato") + "  " + m.cfg.Root,
 		"",
-		fmt.Sprintf("scanning… %s files · %s folders · %s · %s",
-			formatCount(p.Files.Load()), formatCount(p.Dirs.Load()), units.FormatSize(p.Bytes.Load()), elapsed),
+		fmt.Sprintf("scanning… %s %s · %s %s · %s · %s",
+			formatCount(files), plural(files, "file"), formatCount(dirs), plural(dirs, "folder"),
+			units.FormatSize(p.Bytes.Load()), elapsed),
 		dimStyle.Render(p.Current()),
 		"",
 		dimStyle.Render("q / ctrl+c: cancel"),
@@ -243,7 +247,7 @@ func (m Model) renderRow(r row, styled bool) string {
 	var name string
 	switch {
 	case r.node == nil:
-		name = dim(fmt.Sprintf("  … %s small %s", formatCount(int64(r.hiddenCount)), plural(r.hiddenCount, "item")))
+		name = dim(fmt.Sprintf("  … %s small %s", formatCount(int64(r.hiddenCount)), plural(int64(r.hiddenCount), "item")))
 	case r.node.IsDir():
 		marker := "▸ "
 		if m.view == treeView && m.expanded[r.node] {
@@ -272,7 +276,7 @@ func bar(pct float64) string {
 	return strings.Repeat("█", min(n, barWidth))
 }
 
-func plural(n int, word string) string {
+func plural(n int64, word string) string {
 	if n == 1 {
 		return word
 	}

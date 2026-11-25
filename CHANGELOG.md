@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The one-line key legend shown on short terminals leaves out `↑↓` so that it
+  fits in 80 columns.
+
+### Fixed
+
+- The progress screen says "1 file" and "1 folder", and the rescan status
+  "1 file", instead of "1 files" and "1 folders".
+
 ## [0.1.0] - 2026-11-25
 
 First release. Install with `brew install lemiorhan/dirstato/dirstato`.
