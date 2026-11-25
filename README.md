@@ -6,7 +6,8 @@
 
 <p align="center">
   <strong>See what is eating your disk, right in the terminal.</strong><br>
-  A fast, read-only disk usage explorer for macOS whose numbers match <code>du</code>.
+  A fast, read-only disk usage explorer for macOS whose numbers match <code>du</code>.<br>
+  <a href="https://lemiorhanergin.com/dirstato/">Try it in your browser</a>
 </p>
 
 <p align="center">

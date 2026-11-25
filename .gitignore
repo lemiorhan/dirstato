@@ -12,6 +12,9 @@ coverage.*
 go.work
 go.work.sum
 
+# Copied from docs/assets by the Pages workflow
+/site/logo.svg
+
 # Editors and OS
 .idea/
 .vscode/

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dirstato · see what is eating your disk</title>
+<meta name="description" content="A fast, read-only disk usage explorer for the macOS terminal. Walk your folders as a tree; every size matches du -skx.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1012" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://lemiorhanergin.com/dirstato/">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="dirstato · see what is eating your disk">
+<meta property="og:description" content="A fast, read-only disk usage explorer for the macOS terminal whose numbers match du -skx.">
+<meta property="og:url" content="https://lemiorhanergin.com/dirstato/">
+<meta property="og:image" content="https://lemiorhanergin.com/dirstato/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/text.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/display.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script defer src="scan-data.js"></script>
+<script defer src="tui.js"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topline">
+  <a class="brand" href="#top" aria-label="dirstato, back to top"><img src="logo.svg" width="20" height="20" alt=""><b>dirstato</b></a>
+  <span class="where" aria-hidden="true">· read-only disk usage · macOS</span>
+  <nav aria-label="Sections">
+    <a href="#numbers">numbers</a>
+    <a href="#speed">speed</a>
+    <a href="#keys">keys</a>
+    <a href="#install">install</a>
+    <a href="https://github.com/lemiorhan/dirstato">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <h1><span>See what is eating your disk.</span> <span class="quiet">Same numbers as du.</span></h1>
+    <p class="lede">dirstato is a fast, read-only disk usage explorer for the macOS terminal. Walk your folders as a tree or one at a time; every size is counted the way <code>du -skx</code> counts it.</p>
+    <div class="prompt">
+      <span class="ps1" aria-hidden="true">$</span>
+      <code id="cmd-brew">brew install lemiorhan/dirstato/dirstato</code><span class="cursor" aria-hidden="true">█</span>
+      <button class="copy" type="button" data-copy="cmd-brew"><span class="label">copy</span><span class="visually-hidden"> the Homebrew install command</span></button>
+    </div>
+    <p class="facts"><a href="#install">or go install</a> · macOS only · Apache 2.0 · <a href="https://github.com/lemiorhan/dirstato/releases/tag/v0.1.0">v0.1.0</a> · never deletes anything</p>
+  </section>
+
+  <section class="session" aria-label="Interactive demo">
+    <div class="screen-col">
+      <div class="screen" id="screen" tabindex="0" aria-label="dirstato demo, a replay of a real scan. Arrow keys or j and k move, right arrow opens, left arrow closes, Tab switches views, s sorts, m sets the minimum size, question mark shows help. Escape or Shift+Tab leaves." aria-describedby="note">
+<pre id="screen-text"><span class="ln"><b>dirstato</b>  /opt/homebrew/Cellar/go/1.27.4/libexec · size desc · min 4M · tree</span><span class="ln">────────────────────────────────────────────────────────────────────────────────────────────</span><span class="ln sel"> 270.6M 100% <span class="bar">██████████</span>    16K 2026-11-02 ▾ /opt/homebrew/Cellar/go/1.27.4/libexec          </span><span class="ln"> 156.1M  58% <span class="bar">██████</span>        12K 2026-11-02   ▸ src/</span><span class="ln">  66.2M  24% <span class="bar">██</span>             13 2026-11-02   ▸ pkg/</span><span class="ln">  19.0M   7% <span class="bar">█</span>            3.5K 2026-11-02   ▸ test/</span><span class="ln">  18.3M   7% <span class="bar">█</span>               2 2026-11-02   ▸ bin/</span><span class="ln">   8.6M   3% <span class="bar">█</span>              30 2026-11-02   ▸ api/</span><span class="ln">   2.3M   1% <span class="bar">█</span>              58              <span class="d">  … 9 small items</span></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln"></span><span class="ln">────────────────────────────────────────────────────────────────────────────────────────────</span><span class="ln">→← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit</span><span class="ln"></span></pre>
+      </div>
+      <div class="keypad" id="keypad" role="group" aria-label="Demo keys" hidden>
+        <button type="button" data-key="up" aria-label="Move up">↑</button>
+        <button type="button" data-key="down" aria-label="Move down">↓</button>
+        <button type="button" data-key="left" aria-label="Close or go up">←</button>
+        <button type="button" data-key="right" aria-label="Open or enter">→</button>
+        <button type="button" data-key="tab" aria-label="Switch view">Tab</button>
+        <button type="button" data-key="s" aria-label="Cycle sort">s</button>
+        <button type="button" data-key="m" aria-label="Set minimum size">m</button>
+        <button type="button" data-key="c" aria-label="Copy path">c</button>
+        <button type="button" data-key="r" aria-label="Rescan selection">r</button>
+        <button type="button" data-key="?" aria-label="Help">?</button>
+        <button type="button" data-key="q" aria-label="Quit">q</button>
+      </div>
+      <div class="keypad" id="minpad" role="group" aria-label="Minimum size" hidden>
+        <button type="button" data-min="1M">1M</button>
+        <button type="button" data-min="4M">4M</button>
+        <button type="button" data-min="16M">16M</button>
+        <button type="button" data-min="64M">64M</button>
+        <button type="button" data-min="0">0</button>
+        <button type="button">esc</button>
+      </div>
+      <p class="caption" id="caption">A real scan of Go 1.27.4's <code>libexec</code> folder, captured on 2026-11-25 and replayed here. Items under 128K were folded when it was captured. Click a row, or focus the screen and use dirstato's keys; Esc leaves.</p>
+    </div>
+    <aside class="note" id="note">
+      <p class="note-title">/opt/homebrew/Cellar/go/1.27.4/libexec</p>
+      <p>270.6M is 283,734,016 bytes, or 277,084 KiB: exactly what <code>du -skx</code> reports for this folder.</p>
+    </aside>
+    <p class="visually-hidden" id="announce" aria-live="polite"></p>
+  </section>
+
+  <section class="block" id="numbers" aria-labelledby="numbers-h">
+    <div class="lead">
+      <h2 id="numbers-h">The root total is du's total.</h2>
+      <p class="intro">Sizes are allocated disk blocks, the measure <code>du -skx</code> uses. Run both on the folder from the demo and they land on the same number.</p>
+    </div>
+    <div class="body">
+    <div class="agree" role="img" aria-label="du -skx reports 277084 KiB; dirstato reports 277084 KiB.">
+      <span class="who">du -skx</span><span class="num">277084</span><span class="unit">KiB</span>
+      <span class="who">dirstato</span><span class="num">277084</span><span class="unit">KiB</span>
+    </div>
+<pre class="transcript"><span class="ps1">$</span> du -skx /opt/homebrew/Cellar/go/1.27.4/libexec
+277084	/opt/homebrew/Cellar/go/1.27.4/libexec
+
+<span class="ps1">$</span> dirstato /opt/homebrew/Cellar/go/1.27.4/libexec
+<span class="wide"> 270.6M 100% <span class="bar">██████████</span>    16K 2026-11-02 ▾ /opt/homebrew/Cellar/go/1.27.4/libexec</span><span class="narrow"> 270.6M 100% <span class="bar">██████████</span> ▾ /opt/homebrew/C…</span>
+
+<span class="faint">270.6M = 283,734,016 bytes = 277,084 KiB</span></pre>
+    <dl class="rules">
+      <dt>Disk usage, not file length</dt>
+      <dd>Each entry counts <code>st_blocks × 512</code>, so a sparse file counts what it actually occupies. A folder's own blocks count too.</dd>
+      <dt>Hard links count once</dt>
+      <dd>When several paths share an inode, the path that sorts first carries the bytes and the others show <code>0</code>.</dd>
+      <dt>Symlinks are not followed</dt>
+      <dd>A symlink counts as itself. Only the root is resolved: pass a symlink to a folder and its target is scanned.</dd>
+      <dt>One file system</dt>
+      <dd>The scan does not descend into folders on another device, such as mounted volumes.</dd>
+      <dt>Unreadable folders are marked</dt>
+      <dd>They get a <code>!</code>, keep their own blocks, and the scan goes on.</dd>
+    </dl>
+    <p class="pinned">Pinned by tests that compare dirstato with <code>/usr/bin/du</code> on fixture trees with hard links, symlinks, sparse files, unreadable folders and a mounted disk image: <a href="https://github.com/lemiorhan/dirstato/blob/main/internal/scan/scan_eval_test.go">scan_eval_test.go</a>.</p>
+    </div>
+  </section>
+
+  <section class="block" id="speed" aria-labelledby="speed-h">
+    <div class="lead">
+      <h2 id="speed-h">Four times faster than du. Measured once.</h2>
+      <p class="intro">Folders are scanned in parallel, and every node stays in memory so sorting and filtering are instant afterwards.</p>
+    </div>
+    <div class="body">
+    <div class="race" role="img" aria-label="dirstato scanned in 11.6 seconds; du -skx took 46.5 seconds on the same folder.">
+      <span class="who">dirstato</span><span class="time">11.6 s</span><span class="bars bar">███████▌</span>
+      <span class="who">du -skx</span><span class="time">46.5 s</span><span class="bars bar">██████████████████████████████</span>
+    </div>
+    <dl class="figures">
+      <dt>nodes</dt><dd>1.57 million</dd>
+      <dt>heap after GC</dt><dd>183 MB, 116 bytes per node</dd>
+      <dt>peak RSS</dt><dd>288 MB</dd>
+      <dt>root size vs du</dt><dd>identical</dd>
+    </dl>
+    <p class="pinned">One run on the author's Mac on 2026-11-24, scanning a <code>~/Code</code> folder. Your disk will differ; measure it:</p>
+    <div class="prompt small">
+      <span class="ps1" aria-hidden="true">$</span>
+      <code id="cmd-eval">DIRSTATO_EVAL_DIR=~/Code go test -run RealDir -v ./internal/scan</code>
+      <button class="copy" type="button" data-copy="cmd-eval"><span class="label">copy</span><span class="visually-hidden"> the measurement command</span></button>
+    </div>
+    </div>
+  </section>
+
+  <section class="block" id="keys" aria-labelledby="keys-h">
+    <div class="lead">
+      <h2 id="keys-h">Driven by keys. None of them deletes.</h2>
+      <p class="intro">The same keys work in the demo above. <kbd>?</kbd> shows them inside dirstato.</p>
+    </div>
+    <div class="body">
+    <dl class="keys">
+      <dt><kbd>↑</kbd> <kbd>↓</kbd> <kbd>j</kbd> <kbd>k</kbd></dt><dd>move up / down one row</dd>
+      <dt><kbd>PgUp</kbd> <kbd>PgDn</kbd></dt><dd>move up / down one page</dd>
+      <dt><kbd>Home</kbd> <kbd>g</kbd> <kbd>End</kbd> <kbd>G</kbd></dt><dd>jump to the first / last row</dd>
+      <dt><kbd>→</kbd> <kbd>l</kbd> <kbd>⏎</kbd></dt><dd>tree: expand the folder or step into its first child; drill-down: enter it</dd>
+      <dt><kbd>←</kbd> <kbd>h</kbd></dt><dd>tree: collapse the folder or jump to its parent; drill-down: go up</dd>
+      <dt><kbd>Tab</kbd></dt><dd>switch between the tree and drill-down, keeping the selection</dd>
+      <dt><kbd>s</kbd></dt><dd>sort: size descending → size ascending → name</dd>
+      <dt><kbd>m</kbd></dt><dd>set the minimum size; smaller items fold into one row per folder</dd>
+      <dt><kbd>c</kbd></dt><dd>copy the absolute path, shell-quoted when needed</dd>
+      <dt><kbd>r</kbd></dt><dd>rescan the selected folder after you clean up; parent totals update</dd>
+      <dt><kbd>q</kbd></dt><dd>quit</dd>
+    </dl>
+    <p class="pinned">There is no delete key. dirstato tells you where the space went; you decide what to do about it.</p>
+    </div>
+  </section>
+
+  <section class="block" id="install" aria-labelledby="install-h">
+    <div class="lead">
+      <h2 id="install-h">Install</h2>
+      <p class="intro">dirstato runs on macOS only: it reads file system metadata through macOS system calls and copies with <code>pbcopy</code>.</p>
+    </div>
+    <div class="body">
+    <div class="steps">
+      <p class="comment"># Homebrew. The tap builds from source; Homebrew installs Go for the build.</p>
+      <div class="prompt">
+        <span class="ps1" aria-hidden="true">$</span>
+        <code id="cmd-brew-2">brew install lemiorhan/dirstato/dirstato</code>
+        <button class="copy" type="button" data-copy="cmd-brew-2"><span class="label">copy</span><span class="visually-hidden"> the Homebrew install command</span></button>
+      </div>
+      <p class="comment"># Go 1.27 or newer</p>
+      <div class="prompt">
+        <span class="ps1" aria-hidden="true">$</span>
+        <code id="cmd-go">go install github.com/lemiorhan/dirstato@latest</code>
+        <button class="copy" type="button" data-copy="cmd-go"><span class="label">copy</span><span class="visually-hidden"> the go install command</span></button>
+      </div>
+      <p class="comment"># From source</p>
+      <div class="prompt">
+        <span class="ps1" aria-hidden="true">$</span>
+        <code id="cmd-src">git clone https://github.com/lemiorhan/dirstato.git &amp;&amp; cd dirstato &amp;&amp; go build -o dirstato .</code>
+        <button class="copy" type="button" data-copy="cmd-src"><span class="label">copy</span><span class="visually-hidden"> the build-from-source commands</span></button>
+      </div>
+    </div>
+    <p class="comment run-h"># Then point it at a folder</p>
+<pre class="transcript"><span class="ps1">$</span> dirstato                      <span class="faint"># scan the current folder</span>
+<span class="ps1">$</span> dirstato ~/Library --min 1G   <span class="faint"># only items of 1 GiB or more</span>
+<span class="ps1">$</span> dirstato /Applications</pre>
+    </div>
+  </section>
+
+  <section class="close" aria-labelledby="close-h">
+    <h2 id="close-h">Find out where the space went.</h2>
+    <div class="prompt">
+      <span class="ps1" aria-hidden="true">$</span>
+      <code id="cmd-brew-3">brew install lemiorhan/dirstato/dirstato</code><span class="cursor" aria-hidden="true">█</span>
+      <button class="copy" type="button" data-copy="cmd-brew-3"><span class="label">copy</span><span class="visually-hidden"> the Homebrew install command</span></button>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>dirstato 0.1.0 · 2026-11-25 · <a href="https://github.com/lemiorhan/dirstato/blob/main/LICENSE">Apache License 2.0</a> · © 2026 Lemi Orhan Ergin</p>
+  <p><a href="https://github.com/lemiorhan/dirstato">Source</a> · <a href="https://github.com/lemiorhan/dirstato/blob/main/CHANGELOG.md">Changelog</a> · <a href="https://github.com/lemiorhan/dirstato/issues">Issues</a> · <a href="https://github.com/lemiorhan/dirstato/blob/main/SECURITY.md">Security</a></p>
+  <p class="faint">Built with Bubble Tea, Bubbles and Lip Gloss. Type derived from GitHub's Monaspace, under the <a href="fonts/OFL.txt">SIL Open Font License</a>.</p>
+</footer>
+
+<div class="statusline" id="status" role="status" aria-live="polite"></div>
+</body>
+</html>

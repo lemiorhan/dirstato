@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-25T09:42:52Z",
+  "title": "Design System: dirstato",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Paper", "cssVar": "--bg", "appearance": "light" },
+      "ink": { "role": "neutral", "displayName": "Ink", "cssVar": "--ink", "appearance": "light" },
+      "faint": { "role": "neutral", "displayName": "Faint Ink", "cssVar": "--faint", "appearance": "light" },
+      "rule": { "role": "neutral", "displayName": "Rule", "cssVar": "--rule", "appearance": "light" },
+      "focus": { "role": "secondary", "displayName": "Focus Ember", "cssVar": "--focus", "appearance": "light" },
+      "paper-dark": { "role": "neutral", "displayName": "Paper (dark)", "cssVar": "--bg", "appearance": "dark" },
+      "ink-dark": { "role": "neutral", "displayName": "Ink (dark)", "cssVar": "--ink", "appearance": "dark" },
+      "faint-dark": { "role": "neutral", "displayName": "Faint Ink (dark)", "cssVar": "--faint", "appearance": "dark" },
+      "rule-dark": { "role": "neutral", "displayName": "Rule (dark)", "cssVar": "--rule", "appearance": "dark" },
+      "focus-dark": { "role": "secondary", "displayName": "Focus Ember (dark)", "cssVar": "--focus", "appearance": "dark" },
+      "coral": { "role": "primary", "displayName": "Cursor Coral", "cssVar": "--accent", "appearance": "both" },
+      "selection-text": { "role": "neutral", "displayName": "Selection Text", "cssVar": null, "appearance": "both" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero headline only; its quiet second line drops to weight 500 in faint ink." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings; the closing headline scales to clamp(2rem, 5vw, 4.5rem)." },
+      "numeral": { "displayName": "Numeral", "purpose": "Side-by-side figures proving agreement with du; min(2.5rem, 10.5vw) on phones." },
+      "prompt": { "displayName": "Prompt", "purpose": "The install command after $; 15px at weight 500 for second-tier prompts and on phones." },
+      "body": { "displayName": "Body", "purpose": "Running text, max 62-64ch; the lede is 17px (16px on phones)." },
+      "screen": { "displayName": "Screen", "purpose": "The live demo; 12.5px on phones." },
+      "label": { "displayName": "Label", "purpose": "Top line, notes, transcripts, keypad, footer, status line." },
+      "caption": { "displayName": "Caption", "purpose": "Demo caption and the note's legend." }
+    },
+    "shadows": [
+      { "name": "hairline-stroke", "value": "inset 0 0 0 1px var(--ink)", "purpose": "Zero-blur 1px stroke on copy hover/done; keypad keys use var(--faint), kbd uses var(--rule). Not depth." },
+      { "name": "screen-focus-ring", "value": "0 0 0 1px var(--focus)", "purpose": "Doubles the demo screen's 1px border to 2px on focus." },
+      { "name": "bar-seam", "value": "text-shadow: 0.06em 0 currentColor", "purpose": "Closes the seams between block-bar glyphs." }
+    ],
+    "motion": [
+      { "name": "redraw", "value": "instant", "purpose": "All state changes redraw without transitions, including the status line." },
+      { "name": "anchor-scroll", "value": "scroll-behavior: smooth", "purpose": "In-page anchor jumps, only under prefers-reduced-motion: no-preference." },
+      { "name": "cursor-blink", "value": "blink 1.06s steps(1, end) infinite", "purpose": "The prompt block cursor and the focused demo caret; only under prefers-reduced-motion: no-preference." },
+      { "name": "scan-tick", "value": "100ms", "purpose": "Frame interval of the scan replay (TICK_MS)." },
+      { "name": "scan-replay", "value": "1200ms", "purpose": "Initial scan replay length (SCAN_MS); rescan is 700ms (RESCAN_MS), launch delay 450ms (LAUNCH_MS)." },
+      { "name": "tour-step", "value": "1150ms", "purpose": "Autoplay tour key interval (TOUR_STEP_MS); stops when its fixed script ends or the visitor interacts." },
+      { "name": "key-flash", "value": "260ms", "purpose": "Keypad key reverse-video flash when the tour presses it." },
+      { "name": "status-hold", "value": "3000ms", "purpose": "How long the status line message stays." },
+      { "name": "start-threshold", "value": "IntersectionObserver rootMargin 0px 0px -120px 0px", "purpose": "The replay starts when about 120px of the screen is in view." },
+      { "name": "reduced-motion", "value": "prefers-reduced-motion: reduce", "purpose": "Final state drawn at once: no scan or rescan replay, no tour, no blink, no smooth scroll." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "max-width: 759px" },
+      { "name": "two-column-lists", "value": "min-width: 760px" },
+      { "name": "narrow-transcript", "value": "max-width: 799px" },
+      { "name": "session-note", "value": "min-width: 1240px" },
+      { "name": "lead-body", "value": "min-width: 1360px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Copy Button",
+      "kind": "button",
+      "refersTo": "copy-button",
+      "description": "Reverse-video text-cell button beside an install command; clears to an outlined cell on hover and after copying.",
+      "html": "<button class=\"ds-copy\" type=\"button\">copy</button>",
+      "css": ".ds-copy { font-family: var(--mono); font-size: 18px; font-weight: 500; line-height: 1.5; color: var(--bg); background: var(--ink); border: 0; border-radius: 0; padding: 0 1ch; cursor: pointer; } .ds-copy:hover { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); } .ds-copy:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Keypad Key",
+      "kind": "button",
+      "refersTo": "key-button",
+      "description": "A demo key: transparent cell with a faint hairline, reverse video on hover.",
+      "html": "<button class=\"ds-key\" type=\"button\" aria-label=\"Open or enter\">→</button>",
+      "css": ".ds-key { font-family: var(--mono); font-size: 14px; line-height: 1.5; min-width: 4ch; min-height: 2.25rem; padding: 0 1ch; background: transparent; color: var(--ink); border: 0; border-radius: 0; box-shadow: inset 0 0 0 1px var(--faint); cursor: pointer; } .ds-key:hover { background: var(--ink); color: var(--bg); } .ds-key:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Prompt",
+      "kind": "custom",
+      "description": "The primary action: faint $, the command, a coral block cursor, then the copy button.",
+      "html": "<div class=\"ds-prompt\"><span class=\"ds-ps1\">$</span> <code class=\"ds-cmd\">brew install lemiorhan/dirstato/dirstato</code><span class=\"ds-cursor\">█</span><button class=\"ds-prompt-copy\" type=\"button\">copy</button></div>",
+      "css": ".ds-prompt { font-family: var(--mono); font-size: 18px; line-height: 1.5; color: var(--ink); background: var(--bg); padding-left: 2ch; text-indent: -2ch; } .ds-ps1 { color: var(--faint); user-select: none; } .ds-cmd { font-family: inherit; font-weight: 600; overflow-wrap: anywhere; } .ds-cursor { color: var(--accent); user-select: none; } @media (prefers-reduced-motion: no-preference) { .ds-cursor { animation: ds-blink 1.06s steps(1, end) infinite; } } @keyframes ds-blink { 50% { opacity: 0; } } .ds-prompt-copy { font: inherit; font-weight: 500; text-indent: 0; margin-left: 1ch; color: var(--bg); background: var(--ink); border: 0; border-radius: 0; padding: 0 1ch; cursor: pointer; } .ds-prompt-copy:hover { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }"
+    },
+    {
+      "name": "Link",
+      "kind": "nav",
+      "refersTo": "link-hover",
+      "description": "Inherited colour, rule-colour underline; reverse video on hover.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-link\" href=\"#numbers\">numbers</a> <a class=\"ds-link\" href=\"#speed\">speed</a> <a class=\"ds-link\" href=\"#install\">install</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 2ch; font-family: var(--mono); font-size: 14px; color: var(--ink); } .ds-link { color: inherit; text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1px; text-underline-offset: 0.25em; } .ds-nav .ds-link { text-decoration: none; padding: 0 0.25ch; } .ds-link:hover { background: var(--ink); color: var(--bg); text-decoration-color: transparent; } .ds-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }"
+    },
+    {
+      "name": "Demo Screen",
+      "kind": "card",
+      "refersTo": "screen",
+      "description": "The TUI surface: 1px rule border, monochrome rows, reverse-video selection, block bars.",
+      "html": "<div class=\"ds-screen\" tabindex=\"0\"><pre><span class=\"ds-ln\"><b>dirstato</b>  /opt/homebrew/Cellar/go/1.27.4/libexec · size desc</span><span class=\"ds-ln ds-sel\"> 270.6M 100% <span class=\"ds-bar\">██████████</span> ▾ libexec</span><span class=\"ds-ln\"> 156.1M  58% <span class=\"ds-bar\">██████</span>       ▸ src/</span><span class=\"ds-ln ds-d\">   2.3M   1% <span class=\"ds-bar\">█</span>            … 9 small items</span></pre></div>",
+      "css": ".ds-screen { font-family: var(--mono); font-size: 15px; line-height: 1.45; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); padding: 0.75em 1ch; overflow: hidden; font-feature-settings: \"calt\" 0; } .ds-screen:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); } .ds-screen pre { margin: 0; white-space: pre; font: inherit; } .ds-ln { display: block; min-height: 1.45em; } .ds-sel { background: var(--ink); color: var(--bg); } .ds-d { color: var(--faint); } .ds-bar { text-shadow: 0.06em 0 currentColor; }"
+    },
+    {
+      "name": "Key Cap",
+      "kind": "chip",
+      "refersTo": "key-cap",
+      "description": "Inline kbd: square cell with a rule-colour hairline.",
+      "html": "<span class=\"ds-keys\"><kbd class=\"ds-kbd\">↑</kbd> <kbd class=\"ds-kbd\">↓</kbd> <kbd class=\"ds-kbd\">Tab</kbd> move and switch</span>",
+      "css": ".ds-keys { font-family: var(--mono); font-size: 16px; color: var(--ink); } .ds-kbd { font-family: inherit; font-size: 1em; display: inline-block; min-width: 2.2ch; padding: 0 0.5ch; text-align: center; font-weight: 500; box-shadow: inset 0 0 0 1px var(--rule); }"
+    },
+    {
+      "name": "Status Line",
+      "kind": "custom",
+      "refersTo": "status-line",
+      "description": "Reverse-video bottom bar for transient messages; no transition.",
+      "html": "<div class=\"ds-status\" role=\"status\">Copied: brew install lemiorhan/dirstato/dirstato</div>",
+      "css": ".ds-status { font-family: var(--mono); font-size: 14px; padding: 0.5rem var(--gutter); background: var(--ink); color: var(--bg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }"
+    },
+    {
+      "name": "Box Rule",
+      "kind": "custom",
+      "description": "Section divider drawn with box-drawing characters in rule colour.",
+      "html": "<div class=\"ds-rule\" aria-hidden=\"true\"></div>",
+      "css": ".ds-rule::before { content: \"────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────\"; display: block; overflow: hidden; white-space: nowrap; color: var(--rule); font-family: var(--mono); font-feature-settings: \"calt\" 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "One Character-Cell Surface",
+    "overview": "The site is a terminal profile, not a page about a terminal. Everything sits on one ground, on a monospace grid, and the world's devices are the TUI's own: box-drawing rules, block bars, ▸ ▾ markers, reverse-video selection, a `$` prompt with a block cursor. The page follows the system appearance: near-white paper with ink in light, ink-black ground with soft white in dark, faint ink for anything secondary. (The North Star is taken from the direction contract's THESIS and its form name, Text Mode. The user has not confirmed it as a name.)\n\nDensity is the TUI's: text at reading size, wide gutters, large gaps between sections, and display type set heavy and wide so the headlines read as type on a screen, not as a marketing hero. Colour is nearly absent. One coral accent exists and it belongs to the cursor. Depth does not exist: the surface is flat, divided only by rules and by reverse video.\n\nInteraction is keyboard-first. The live demo is driven by dirstato's real keymap, hover answers with reverse video, and redraws are instant like a terminal's.",
+    "keyCharacteristics": [
+      "One flat ground per appearance; no cards, panels or raised surfaces.",
+      "Every character on the monospace grid; horizontal spacing in `ch`.",
+      "Box-drawing `─` rules and 1px hairlines are the only dividers.",
+      "Reverse video (ink ground, paper text) for selection and hover.",
+      "Coral only in the cursor family.",
+      "Instant redraws; the only timed motion is the ticking scan replay, the demo's autoplay tour, the blinking cursor and smooth anchor scrolling."
+    ],
+    "rules": [
+      { "name": "The Cursor Owns Coral Rule", "body": "Coral marks where the cursor is: selection, the block cursor, the demo caret. Nothing else takes it, not links, not hover, not headings, not focus.", "section": "colors" },
+      { "name": "The Reverse Video Rule", "body": "Hover and selection answer by swapping ink and paper. A hovered link, a hovered key, a selected demo row and the status line all use ink ground with paper text.", "section": "colors" },
+      { "name": "The Logo Is Not the Palette Rule", "body": "The logo's amber, teal and blue bars and its dark gradient tile stay inside the logo. Only its coral enters the system, as the cursor.", "section": "colors" },
+      { "name": "The One Grid Rule", "body": "Every face is monospace, and every measure inside text (gaps between words and cells, indents, list column widths, text max widths) is given in `ch`, so text, rules and bars line up as cells. Page-level layout (gutter, caps, block columns) is the only exception.", "section": "typography" },
+      { "name": "The No Ligatures in Cells Rule", "body": "Body text keeps contextual alternates on (`calt` 1). The demo screen, transcripts, the race bars and the box-drawing rules turn them off (`calt` 0), so columns and rule characters never shift.", "section": "typography" },
+      { "name": "The Text Wraps, the Screen Re-Renders Rule", "body": "Prose reflows; terminal output never reflows mid-row. It is re-rendered at a narrower column count, the way the real TUI does it.", "section": "layout" },
+      { "name": "The Flat Surface Rule", "body": "Nothing floats. A shadow with blur, an offset meant to suggest height, or a glow is outside this world.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** keep every surface on the single paper ground; divide it with box-drawing `─` rules or 1px rule-colour hairlines.",
+      "**Do** answer hover and selection with reverse video (ink ground, paper text).",
+      "**Do** keep coral to the cursor family: `::selection`, the block cursor, the demo caret.",
+      "**Do** use the `focus` colour (2px outline, 3px offset) for keyboard focus.",
+      "**Do** give horizontal measures in `ch` and keep all type monospace.",
+      "**Do** wrap runs of `█` in the bar treatment (`0.06em 0 currentColor` text-shadow) so they read as one solid bar.",
+      "**Do** turn off contextual alternates (`calt` 0) in any terminal output, bars and box-drawing rules.",
+      "**Do** re-render terminal output at a narrower column count instead of letting it wrap mid-row; drop date, then count, like the app.",
+      "**Do** keep redraws instant and skip the scan replay, tour, blink and smooth scroll under reduced motion."
+    ],
+    "donts": [
+      "**Don't** use coral for links, hover, headings, focus or emphasis.",
+      "**Don't** use blurred, glowing or height-suggesting shadows; `box-shadow` is only a zero-blur 1px stroke, and `text-shadow` only the bar seam.",
+      "**Don't** round corners or put content in cards or panels; the logo is the only rounded shape.",
+      "**Don't** bring the logo's amber, teal or blue into the interface.",
+      "**Don't** set coral text or coral-only indicators on the light paper (2.72:1).",
+      "**Don't** add colour to the demo; it stays monochrome like the real TUI."
+    ]
+  }
+}
