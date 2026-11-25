@@ -46,7 +46,7 @@ const (
 	byName
 )
 
-var sortLabels = []string{"size desc", "size asc", "isim"}
+var sortLabels = []string{"size desc", "size asc", "name"}
 
 type row struct {
 	node        *scan.Node // nil on a summary row
@@ -110,7 +110,7 @@ const (
 
 func New(cfg Config) Model {
 	in := textinput.New()
-	in.Prompt = "Minimum boyut: "
+	in.Prompt = "Minimum size: "
 	in.Placeholder = "500M, 1.5G, 0"
 	ctx, cancel := context.WithCancel(context.Background())
 	p := &scan.Progress{}
@@ -179,7 +179,7 @@ func (m Model) update(msg tea.Msg) (Model, tea.Cmd) {
 			if errors.Is(msg.res.Err, context.Canceled) {
 				return m, nil
 			}
-			return m.flash("Yeniden tarama başarısız: " + msg.res.Err.Error())
+			return m.flash("Rescan failed: " + msg.res.Err.Error())
 		}
 		sel, hadSel := m.selected()
 		m.tree.Apply(msg.res)
@@ -328,9 +328,9 @@ func (m Model) copySelected() (Model, tea.Cmd) {
 	}
 	text := clip.Quote(r.target().Path())
 	if err := m.cfg.Copy(text); err != nil {
-		return m.flash("Kopyalanamadı: " + err.Error())
+		return m.flash("Copy failed: " + err.Error())
 	}
-	return m.flash("Kopyalandı: " + text)
+	return m.flash("Copied: " + text)
 }
 
 func (m Model) rescanSelected() (Model, tea.Cmd) {

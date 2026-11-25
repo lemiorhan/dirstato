@@ -15,11 +15,11 @@ var sizePattern = regexp.MustCompile(`^(\d+(?:\.\d+)?)\s*([kmgtp]?)(?:i?b)?$`)
 func ParseSize(s string) (int64, error) {
 	m := sizePattern.FindStringSubmatch(strings.ToLower(strings.TrimSpace(s)))
 	if m == nil {
-		return 0, fmt.Errorf("geçersiz boyut: %q (örnek: 500M, 1.5G, 0)", s)
+		return 0, fmt.Errorf("invalid size: %q (examples: 500M, 1.5G, 0)", s)
 	}
 	v, err := strconv.ParseFloat(m[1], 64)
 	if err != nil {
-		return 0, fmt.Errorf("geçersiz boyut: %q", s)
+		return 0, fmt.Errorf("invalid size: %q", s)
 	}
 	exp := strings.Index("kmgtp", m[2]) + 1
 	if m[2] == "" {
@@ -27,7 +27,7 @@ func ParseSize(s string) (int64, error) {
 	}
 	bytes := v * math.Pow(1024, float64(exp))
 	if bytes >= math.MaxInt64 {
-		return 0, fmt.Errorf("boyut çok büyük: %q", s)
+		return 0, fmt.Errorf("size too large: %q", s)
 	}
 	return int64(bytes), nil
 }

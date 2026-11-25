@@ -101,7 +101,7 @@ func Scan(ctx context.Context, path string, opts Options, p *Progress) (*Tree, e
 		return nil, &os.PathError{Op: "stat", Path: abs, Err: err}
 	}
 	if st.Mode&unix.S_IFMT != unix.S_IFDIR {
-		return nil, fmt.Errorf("%s bir klasör değil", abs)
+		return nil, fmt.Errorf("%s is not a folder", abs)
 	}
 	t := &Tree{
 		dev:     st.Dev,

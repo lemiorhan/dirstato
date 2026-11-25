@@ -3,6 +3,7 @@ package ui
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -11,6 +12,7 @@ import (
 	"weak"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/x/ansi"
 
 	"github.com/lemiorhan/dirstato/internal/scan"
 )
@@ -534,5 +536,78 @@ func TestHelpKeepsCloseHintOnShortTerminals(t *testing.T) {
 	m.height = 24
 	if lines := strings.Split(m.render(), "\n"); len(lines) != 1+len(helpText) {
 		t.Errorf("height 24: help shows %d lines, want all %d", len(lines), 1+len(helpText))
+	}
+}
+
+func TestHelpFitsAnEightyColumnTerminal(t *testing.T) {
+	_, m := setup(t)
+	m.help = true
+	m.width, m.height = 80, 100
+	lines := strings.Split(ansi.Strip(m.render()), "\n")
+	if len(helpText) < 10 || len(lines) != 1+len(helpText) {
+		t.Fatalf("help has %d text lines and renders %d, want at least 10 shown in full", len(helpText), len(lines))
+	}
+	for i, want := range map[int]string{0: "dirstato · help", 1: "Keys", 15: "Columns", len(lines) - 1: "Press ? or esc to close."} {
+		if got := strings.TrimRight(lines[i], " "); got != want {
+			t.Errorf("help line %d = %q, want %q", i, got, want)
+		}
+	}
+	for i, want := range helpText {
+		if got := strings.TrimRight(lines[1+i], " "); got != want {
+			t.Errorf("help line %d is cut at 80 columns:\n got %q\nwant %q", i, got, want)
+		}
+	}
+}
+
+func endsSomeLine(text, suffix string) bool {
+	for _, l := range strings.Split(text, "\n") {
+		if strings.HasSuffix(strings.TrimRight(l, " "), suffix) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestSummaryRowSaysItemForOne(t *testing.T) {
+	for _, tc := range []struct {
+		small int
+		want  string
+	}{
+		{1, "… 1 small item"},
+		{2, "… 2 small items"},
+	} {
+		root := filepath.Join(t.TempDir(), "root")
+		write(t, filepath.Join(root, "big"), 1<<20)
+		for i := range tc.small {
+			write(t, filepath.Join(root, fmt.Sprintf("small%d", i)), 10)
+		}
+		m := scannedWith(t, Config{Root: root, Min: 100 << 10, MinText: "100K"})
+		if screen := ansi.Strip(m.render()); !endsSomeLine(screen, tc.want) {
+			t.Errorf("%d small files: no row ends with %q in\n%s", tc.small, tc.want, screen)
+		}
+	}
+}
+
+func TestHeaderSaysFolderForOneUnreadable(t *testing.T) {
+	for _, tc := range []struct {
+		locked int
+		want   string
+	}{
+		{1, "· 1 unreadable folder"},
+		{2, "· 2 unreadable folders"},
+	} {
+		root := filepath.Join(t.TempDir(), "root")
+		for i := range tc.locked {
+			dir := filepath.Join(root, fmt.Sprintf("locked%d", i))
+			write(t, filepath.Join(dir, "f"), 10)
+			if err := os.Chmod(dir, 0); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { os.Chmod(dir, 0o755) })
+		}
+		m := scanned(t, root)
+		if h := ansi.Strip(strings.Join(m.header(), "\n")); !strings.HasSuffix(h, tc.want) {
+			t.Errorf("%d locked folders: header %q does not end with %q", tc.locked, h, tc.want)
+		}
 	}
 }

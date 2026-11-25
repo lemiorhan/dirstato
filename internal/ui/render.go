@@ -32,42 +32,42 @@ var (
 )
 
 var fullLegend = []string{
-	"↑↓ j k   hareket        Tab  tree ↔ drill-down",
-	"→ l ⏎   aç / içeri gir  s    size desc→asc→isim",
-	"← h     kapat / çık     m    minimum boyut gir",
-	"c       path kopyala     r    seçili klasörü tara",
-	"?       yardım           q    çık",
+	"↑↓ j k   move           Tab  tree ↔ drill-down",
+	"→ l ⏎    open / enter   s    size desc→asc→name",
+	"← h      close / back   m    set minimum size",
+	"c        copy path      r    rescan selection",
+	"?        help           q    quit",
 }
 
-const shortLegend = "↑↓ hareket · →← aç/kapat · Tab görünüm · s sırala · m min · c kopyala · r tara · ? yardım · q çık"
+const shortLegend = "↑↓ move · →← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit"
 
 var helpText = []string{
-	"Tuşlar",
-	"  ↑ ↓ j k          bir satır yukarı / aşağı",
-	"  pgup pgdown      bir sayfa yukarı / aşağı",
-	"  home g / end G   listenin başı / sonu",
-	"  → l ⏎            tree'de klasörü açar; açıksa ilk çocuğa iner. drill-down'da klasöre girer",
-	"  ← h              tree'de klasörü kapatır ya da parent'a çıkar. drill-down'da bir üst klasöre çıkar",
-	"  Tab              tree ↔ drill-down; seçili öğe korunur",
-	"  s                sıralama: size desc → size asc → isim",
-	"  m                minimum boyut gir (500M, 1.5G, 0 = kapalı)",
-	"  c                seçili öğenin absolute path'ini kopyalar (gerekirse tek tırnakla)",
-	"  r                seçili klasörü yeniden tarar; dosyada parent klasörü tarar",
-	"  ?                bu ekranı açar / kapatır",
-	"  q ctrl+c         çıkış",
+	"Keys",
+	"  ↑ ↓ j k          move up / down one row",
+	"  pgup pgdown      move up / down one page",
+	"  home g / end G   jump to the first / last row",
+	"  → l ⏎            tree: expand or go to first child · drill-down: enter",
+	"  ← h              tree: collapse or go to parent · drill-down: go up",
+	"  Tab              switch tree ↔ drill-down, keeping the selection",
+	"  s                sort: size desc → size asc → name",
+	"  m                set the minimum size (500M, 1.5G, 0 = off)",
+	"  c                copy the absolute path, shell-quoted when needed",
+	"  r                rescan the selected folder (on a file: its parent)",
+	"  ?                open / close this screen",
+	"  q ctrl+c         quit",
 	"",
-	"Kolonlar",
-	"  boyut            disk kullanımı, du -skx ile aynı ölçü; 1024 tabanı",
-	"  %, bar           parent klasörün içindeki payı",
-	"  sayı             alt tree'deki dosya sayısı",
-	"  tarih            alt tree'deki en yeni dosyanın mtime'ı",
-	"  … küçük öğe      minimum boyutun altında kalıp gizlenen öğelerin toplamı",
-	"  !                okunamayan klasör; boyutu eksik olabilir",
+	"Columns",
+	"  size             disk usage, the same measure as du -skx; base 1024",
+	"  %, bar           share of the parent folder",
+	"  count            number of files in the subtree",
+	"  date             newest file modification time in the subtree",
+	"  … small items    total of the items hidden below the minimum size",
+	"  !                unreadable folder; its size may be incomplete",
 	"",
 	helpClose,
 }
 
-const helpClose = "Kapatmak için ? ya da esc."
+const helpClose = "Press ? or esc to close."
 
 func (m Model) render() string {
 	switch m.state {
@@ -75,7 +75,7 @@ func (m Model) render() string {
 		return m.renderProgress()
 	}
 	if m.help {
-		lines := append([]string{headerStyle.Render("dirstato · yardım")}, helpText...)
+		lines := append([]string{headerStyle.Render("dirstato · help")}, helpText...)
 		if len(lines) > m.height {
 			lines = append(lines[:max(0, m.height-1)], helpClose)
 		}
@@ -94,7 +94,7 @@ func (m Model) render() string {
 		lines = append(lines, m.renderRow(m.rows[i], true))
 	}
 	if len(m.rows) == 0 {
-		lines = append(lines, dimStyle.Render("  (boş)"))
+		lines = append(lines, dimStyle.Render("  (empty)"))
 		end++
 	}
 	for i := end - m.offset; i < h; i++ {
@@ -141,13 +141,13 @@ func (m Model) header() []string {
 	if m.view == drillView {
 		view = "drill-down"
 	}
-	minLabel := "min yok"
+	minLabel := "min off"
 	if m.min > 0 {
 		minLabel = "min " + m.minText
 	}
 	labels := " · " + sortLabels[m.sort] + " · " + minLabel + " · " + view
 	if n := m.tree.Errors(); n > 0 {
-		labels += " · " + errorStyle.Render(fmt.Sprintf("%d okunamayan klasör", n))
+		labels += " · " + errorStyle.Render(fmt.Sprintf("%d unreadable %s", n, plural(n, "folder")))
 	}
 	title := headerStyle.Render("dirstato") + "  "
 	room := m.width - ansi.StringWidth(title) - ansi.StringWidth(labels)
@@ -177,9 +177,9 @@ func fitLeft(s string, w int) string {
 func (m Model) statusLine() string {
 	switch {
 	case m.editing:
-		return m.input.View() + dimStyle.Render("   ⏎ uygula · esc vazgeç")
+		return m.input.View() + dimStyle.Render("   ⏎ apply · esc cancel")
 	case m.state == rescanning:
-		return fmt.Sprintf("yeniden taranıyor… %s dosya · %s · %s",
+		return fmt.Sprintf("rescanning… %s files · %s · %s",
 			formatCount(m.progress.Files.Load()), units.FormatSize(m.progress.Bytes.Load()),
 			ansi.Truncate(m.progress.Current(), max(10, m.width-50), "…"))
 	}
@@ -192,11 +192,11 @@ func (m Model) renderProgress() string {
 	lines := []string{
 		headerStyle.Render("dirstato") + "  " + m.cfg.Root,
 		"",
-		fmt.Sprintf("taranıyor… %s dosya · %s klasör · %s · %s",
+		fmt.Sprintf("scanning… %s files · %s folders · %s · %s",
 			formatCount(p.Files.Load()), formatCount(p.Dirs.Load()), units.FormatSize(p.Bytes.Load()), elapsed),
 		dimStyle.Render(p.Current()),
 		"",
-		dimStyle.Render("q / ctrl+c: iptal"),
+		dimStyle.Render("q / ctrl+c: cancel"),
 	}
 	return m.fit(lines)
 }
@@ -243,7 +243,7 @@ func (m Model) renderRow(r row, styled bool) string {
 	var name string
 	switch {
 	case r.node == nil:
-		name = dim(fmt.Sprintf("  … %s küçük öğe", formatCount(int64(r.hiddenCount))))
+		name = dim(fmt.Sprintf("  … %s small %s", formatCount(int64(r.hiddenCount)), plural(r.hiddenCount, "item")))
 	case r.node.IsDir():
 		marker := "▸ "
 		if m.view == treeView && m.expanded[r.node] {
@@ -270,6 +270,13 @@ func bar(pct float64) string {
 		n = 1
 	}
 	return strings.Repeat("█", min(n, barWidth))
+}
+
+func plural(n int, word string) string {
+	if n == 1 {
+		return word
+	}
+	return word + "s"
 }
 
 func formatCount(n int64) string {
