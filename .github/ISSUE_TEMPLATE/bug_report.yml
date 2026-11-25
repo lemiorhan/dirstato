@@ -1,0 +1,50 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please do not report security issues here; see SECURITY.md.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The exact command you ran and the keys you pressed.
+      placeholder: |
+        1. dirstato ~/Library --min 1G
+        2. Press Tab, then r
+    validations:
+      required: true
+  - type: textarea
+    id: du
+    attributes:
+      label: du output (for size disagreements)
+      description: Output of `du -skx <path>` for the same folder.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: dirstato commit or version
+      placeholder: git rev-parse --short HEAD
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: sw_vers -productVersion
+    validations:
+      required: true
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal
+      placeholder: Terminal.app, iTerm2, Ghostty, ...

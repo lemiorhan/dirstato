@@ -1,0 +1,19 @@
+# Binaries
+/dirstato
+*.exe
+*.test
+*.out
+
+# Coverage and profiles
+coverage.*
+*.prof
+
+# Go workspace
+go.work
+go.work.sum
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
