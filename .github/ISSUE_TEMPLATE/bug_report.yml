@@ -33,7 +33,7 @@ body:
     id: version
     attributes:
       label: dirstato commit or version
-      placeholder: git rev-parse --short HEAD
+      placeholder: brew info dirstato, or git rev-parse --short HEAD
     validations:
       required: true
   - type: input

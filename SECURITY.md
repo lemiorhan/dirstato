@@ -2,7 +2,8 @@
 
 ## Supported versions
 
-dirstato has no tagged releases yet. Security fixes land on the `main` branch.
+Only the latest release is supported. Security fixes land on the `main` branch
+and ship in the next release.
 
 ## Reporting a vulnerability
 

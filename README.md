@@ -10,6 +10,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/lemiorhan/dirstato/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lemiorhan/dirstato/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/lemiorhan/dirstato/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/lemiorhan/dirstato"></a>
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"></a>
   <img alt="Go 1.27+" src="https://img.shields.io/badge/go-1.27%2B-00ADD8.svg?logo=go&amp;logoColor=white">
   <img alt="Platform: macOS" src="https://img.shields.io/badge/platform-macOS-lightgrey.svg?logo=apple">
@@ -34,23 +36,18 @@ dirstato  /opt/homebrew/Cellar/go/1.27.4/libexec · size desc · min 4M · tree
    5.9M   4% █             346 2026-11-02     ▸ syscall/
    5.4M   3% █             461 2026-11-02     ▸ net/
    4.1M   3% █             559 2026-11-02     ▸ go/
-  30.3M  19% ██           2.3K                  … 70 küçük öğe
+  30.3M  19% ██           2.3K                  … 70 small items
   66.2M  24% ██             13 2026-11-02   ▸ pkg/
   19.0M   7% █            3.5K 2026-11-02   ▸ test/
   18.3M   7% █               2 2026-11-02   ▸ bin/
    8.6M   3% █              30 2026-11-02   ▸ api/
-   2.3M   1% █              58                … 9 küçük öğe
+   2.3M   1% █              58                … 9 small items
 ────────────────────────────────────────────────────────────────────────────────────────────
-↑↓ hareket · →← aç/kapat · Tab görünüm · s sırala · m min · c kopyala · r tara · ? yardım · q çık
+↑↓ move · →← open/close · Tab view · s sort · m min · c copy · r rescan · ? help · q quit
 ```
 
 <sub>dirstato scanning a Go installation with <code>--min 4M</code>. Items under
-the threshold are folded into one summary row per folder (<em>“70 küçük öğe”</em>
-means “70 small items”).</sub>
-
-> [!NOTE]
-> The interface text is currently in Turkish. Keys, columns and flags are
-> documented in English below.
+the threshold are folded into one summary row per folder.</sub>
 
 ## Features
 
@@ -77,8 +74,28 @@ means “70 small items”).</sub>
 ## Installation
 
 dirstato runs on **macOS** only: it reads file system metadata through macOS
-system calls and copies with `pbcopy`. Building it requires
-[Go](https://go.dev/dl/) 1.27 or newer.
+system calls and copies with `pbcopy`.
+
+### Homebrew
+
+```sh
+brew install lemiorhan/dirstato/dirstato
+```
+
+The formula lives in the
+[lemiorhan/homebrew-dirstato](https://github.com/lemiorhan/homebrew-dirstato)
+tap and builds dirstato from source; Homebrew installs Go for the build. Update
+with `brew upgrade dirstato`.
+
+### Go
+
+With [Go](https://go.dev/dl/) 1.27 or newer:
+
+```sh
+go install github.com/lemiorhan/dirstato@latest
+```
+
+### From source
 
 ```sh
 git clone https://github.com/lemiorhan/dirstato.git
@@ -89,8 +106,6 @@ mv dirstato /usr/local/bin/   # or anywhere on your PATH
 
 To try it without installing, `./start.sh [path] [--min SIZE]` builds into a
 temporary folder and runs it from your current directory.
-
-A Homebrew tap is planned.
 
 ## Usage
 
@@ -145,6 +160,7 @@ items.
 | %, bar        | Share of the parent folder                                               |
 | count         | Number of files in the subtree (folders are not counted)                 |
 | date          | Newest file modification time in the subtree, as `YYYY-MM-DD`            |
+| `… N small items` | Items hidden below the minimum size, summed into one row per folder  |
 | `!`           | The folder could not be read; its size may be incomplete                 |
 
 On narrow terminals the date column is dropped first, then the count. The

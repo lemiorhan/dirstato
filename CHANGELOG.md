@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-25
+
+First release. Install with `brew install lemiorhan/dirstato/dirstato`.
+
 ### Added
 
 - Parallel, read-only disk usage scan whose root total matches `du -skx`:
@@ -22,3 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Copying the selected absolute path, shell-quoted when needed (`c`).
 - Rescanning the selected folder in place (`r`).
 - Help screen (`?`).
+- English user interface and command line messages.
+
+[Unreleased]: https://github.com/lemiorhan/dirstato/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/lemiorhan/dirstato/releases/tag/v0.1.0
